@@ -1,0 +1,479 @@
+---
+title: "Predictive Analysis of Energy Usage for eSC"
+output: html_document
+date: "2024-05-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Predictive Analysis of Energy Usage for eSC
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r static_house_info}
+#install.packages("arrow", type = "source")
+
+library(arrow)
+library(readr)
+library(dplyr)
+library(lubridate)
+library(parallel)
+library(doParallel)
+library(future.apply)
+library(ggplot2)
+
+# Load required packages
+library(data.table)
+
+  # A function to fetch and process energy data for a single house
+  process_energy_data <- function(house_id, county_id) {
+    library(data.table)
+    
+    # Energy data for the house
+    energy_data_url <- paste0("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/2023-houseData/", house_id, ".parquet")
+    energy_data <- as.data.table(arrow::read_parquet(energy_data_url))
+    
+    # Data cleaning - Removing rows with missing values in any column of the energy_data dataframe
+    #Avoiding using na_interpolation to have more accurate data though limited
+    energy_data <- energy_data[complete.cases(energy_data), ]
+    
+    energy_july_data <- filter(energy_data, month(time) == 7)
+    
+    # Adding bldg_id column
+    energy_july_data$bldg_id <- house_id
+    return(energy_july_data)
+  }
+  
+  # A function to fetch and process weather data for a single county
+  process_weather_data <- function(county_id) {
+    library(data.table)
+    # Weather data for the county
+    weather_data_url <- paste0("https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/weather/2023-weather-data/", county_id, ".csv")
+    weather_data <- as.data.table(read_csv(weather_data_url, col_types = cols()))
+    
+    # Data cleaning - Removing rows with missing values in any column of the weather_data dataframe
+    #Avoiding using na_interpolation to have more accurate data though limited
+    weather_data <- weather_data[complete.cases(weather_data), ]
+    weather_july_data <- filter(weather_data, month(date_time) == 7)
+    weather_july_data$county_id<-county_id
+    return(weather_july_data)
+  }
+  
+  # All houses/building information
+  static_house_info_url <- "https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/static_house_info.parquet"
+  static_house_info <- as.data.table(arrow::read_parquet(static_house_info_url))
+  
+  #install.packages("lobstr")
+  library(lobstr)
+  
+  # Check the memory usage of static_house_info
+  obj_size(static_house_info)
+  
+  # Data cleaning
+  static_house_info_cleaned <- static_house_info[complete.cases(static_house_info), ]
+  #View(static_house_info_cleaned)
+  
+  # Filter the house data based on the specified conditions
+  static_house_info_cleaned_filtered <- static_house_info_cleaned %>%
+    filter(
+      in.building_america_climate_zone=="Hot-Humid"
+    )
+  #Renaming column
+  static_house_info_cleaned_filtered <- static_house_info_cleaned_filtered %>%
+    rename( county_id=in.county)
+  
+  # Set up parallel processing
+  cl <- makeCluster(detectCores())  # Use all available cores
+  clusterExport(cl, c("process_energy_data", "static_house_info_cleaned_filtered")) #Export necessary variables, functions to cluster
+  
+  # Load required packages in parallel workers
+  clusterEvalQ(cl, library(dplyr))  # Load dplyr
+  clusterEvalQ(cl, library(lubridate))  # Load lubridate
+  
+  # Apply the function in parallel for energy data 
+  energy_data_list <- parLapply(cl, seq_along(static_house_info_cleaned_filtered$bldg_id), function(i) {
+    #calling function process_energy_data to fetch energy data of each building 
+    process_energy_data(static_house_info_cleaned_filtered$bldg_id[i], static_house_info_cleaned_filtered$in.county[i])
+  })
+  
+  # Combine energy data for all buildings into a single dataframe
+  energy_data <- as.data.table(bind_rows(energy_data_list))
+  energy_data <- energy_data %>%
+    rename(date_time = time)
+  
+  # Apply the function in parallel for weather data 
+  weather_data_list <- mclapply(unique(static_house_info_cleaned_filtered$county_id), function(county_id) {
+    #handling exception
+    tryCatch(
+      #calling process_weather_data to fetch weather data for each county
+      process_weather_data(county_id),
+      error = function(e) {
+        warning(paste("Error processing weather data for county", county_id, ":", conditionMessage(e)))
+        NULL  # Return NULL if an error occurs
+      }
+    )
+  }, mc.cores = parallel::detectCores())
+  
+  # Stop the cluster
+  stopCluster(cl)
+  
+  # Combine weather data for all counties into a single dataframe
+  weather_data <- as.data.table(bind_rows(weather_data_list))
+  
+  #Merging house data and energy data using buidling id
+  house_energy_merged_data <- merge(static_house_info_cleaned_filtered,energy_data, by = c("bldg_id"))
+  
+  # Merge house data and weather data using county id with allow.cartesian = TRUE
+  house_weather_merged_data <- merge(static_house_info_cleaned_filtered, weather_data, by = "county_id", allow.cartesian = TRUE)
+  
+  #final merged data(buidling/house+energy+weather)
+  house_energy_weather_merged_data<-merge(house_energy_merged_data, house_weather_merged_data, by = c("bldg_id","county_id","date_time"))
+
+  # Identify common columns in merged house-energy and house-weather dataframes
+  common_cols <- intersect(names(house_energy_merged_data), names(house_weather_merged_data))
+  
+  # Remove common columns with .y extension
+  for (col in common_cols) {
+    house_energy_weather_merged_data[[paste0(col, ".y")]] <- NULL
+  }
+  
+  # Remove .x suffix from column names
+  names(house_energy_weather_merged_data) <- gsub("\\.x$", "", names(house_energy_weather_merged_data))
+  
+  #Adding column total_energy_consumption to add all energy consumption for cooling purposes
+  house_energy_weather_merged_data$total_energy_consumption <- rowSums(
+    house_energy_weather_merged_data[, c(
+      "out.electricity.cooling.energy_consumption",
+      "out.electricity.cooling_fans_pumps.energy_consumption",
+      "out.electricity.mech_vent.energy_consumption",
+      "out.electricity.refrigerator.energy_consumption",
+      "out.electricity.freezer.energy_consumption"
+    )]
+  )
+  
+  # List of variables(resposible for cooling energy consumption) to visualize
+  variables_to_visualize <- c(
+    "in.cooling_setpoint_has_offset",
+    "in.cooling_setpoint_offset_magnitude",
+    "in.ducts",
+    "in.hvac_cooling_efficiency",
+    "in.hvac_cooling_partial_space_conditioning",
+    "in.hvac_cooling_type",
+    "in.hvac_has_ducts",
+    "in.hvac_has_shared_system",
+    "in.infiltration",
+    "in.insulation_ceiling",
+    "in.insulation_floor",
+    "in.insulation_foundation_wall",
+    "in.insulation_rim_joist",
+    "in.insulation_roof",
+    "in.insulation_slab",
+    "in.insulation_wall",
+    "in.misc_extra_refrigerator",
+    "in.mechanical_ventilation",
+    "in.misc_freezer",
+    "in.refrigerator"
+  )
+
+  # Function to calculate the frequency of each variable across all buildings
+  calculate_variable_frequency <- function(data, variable) {
+    # Group data by variable and count distinct buildings
+    variable_frequency <- data %>%
+      group_by(!!sym(variable)) %>%
+      summarise(buildings_count = n_distinct(bldg_id)) %>%
+      mutate(!!sym(variable) := factor(!!sym(variable), levels = unique(!!sym(variable))))
+    return(variable_frequency)
+  }
+  
+  # Create an empty list to store plots
+  plots <- list()
+  
+  # Loop through each variable and create frequency plots
+  for (variable in variables_to_visualize) {
+    # Calculate frequency of the variable
+    frequency_data <- calculate_variable_frequency(house_energy_weather_merged_data, variable)
+    
+    # Calculate mean total_energy_consumption for each level of the variable
+    energy_by_variable <- house_energy_weather_merged_data %>%
+      group_by(!!sym(variable)) %>%
+      summarize(mean_total_energy_consumption = mean(total_energy_consumption, na.rm = TRUE))
+    
+    # Merge frequency_data with energy_by_variable
+    merged_data <- merge(frequency_data, energy_by_variable, by = variable)
+    
+    # Create bar plot for the variable frequency and mean total_energy_consumption
+    plot <- ggplot(merged_data, aes(x = !!sym(variable), y = buildings_count)) +
+      geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+      labs(title = paste("Frequency of", variable, "in Buildings and Mean Energy Consumption(kWh)"),
+           x = variable, y = "Number of Buildings") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels
+      geom_text(aes(label = round(mean_total_energy_consumption, 2)), vjust = -0.5) 
+    
+    # Add plot to the list
+    plots[[variable]] <- plot
+  }
+  
+  # Display the plots
+  for (variable in variables_to_visualize) {
+    print(plots[[variable]])
+  }
+  
+  #########
+  #Other electricity consuming factors (other can cooling)
+  #Exploring to identify where electricity can be saved to balance over energy consumption for cooling purposes
+  
+  #1. in.ceiling.fan  
+  # Subset the data to include only relevant columns
+  ceiling_fan_data <- house_energy_weather_merged_data[, c("in.ceiling_fan", 
+                                                           "out.electricity.ceiling_fan.energy_consumption")]
+  
+  # Group by "in.ceiling_fan" and calculate total energy consumption
+  ceiling_fan_energy <- aggregate(out.electricity.ceiling_fan.energy_consumption ~ in.ceiling_fan, 
+                                  data = ceiling_fan_data, FUN = sum)
+  
+  # Plot histogram with formatted y-axis labels
+  ggplot(ceiling_fan_energy, aes(x = in.ceiling_fan, y = out.electricity.ceiling_fan.energy_consumption)) +
+    geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+    labs(x = "Ceiling Fan Category", y = "Total Energy Consumption (kWh)",
+         title = "Energy Usage by Ceiling Fan Category") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(labels = function(x) paste0(x, " kWh"))
+  
+  # Aggregate the data to count the number of unique houses in each category of in.ceiling_fan
+  ceiling_fan_house_count <- aggregate(bldg_id ~ in.ceiling_fan, data = house_energy_weather_merged_data, FUN = function(x) length(unique(x)))
+  
+  # Plot histogram with count of unique houses for each category
+  ggplot(ceiling_fan_house_count, aes(x = in.ceiling_fan, y = bldg_id)) +
+    geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+    labs(x = "Ceiling Fan Category", y = "Number of Houses",
+         title = "Number of Houses by Ceiling Fan Category") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  #dryer
+  # Subset the data to include relevant columns for clothes dryer
+  dryer_data <- house_energy_weather_merged_data[, c("in.clothes_dryer", 
+                                                     "out.electricity.clothes_dryer.energy_consumption")]
+  
+  # Group by "in.clothes_dryer" and calculate total energy consumption for clothes dryer
+  dryer_energy <- aggregate(out.electricity.clothes_dryer.energy_consumption ~ in.clothes_dryer, 
+                            data = dryer_data, FUN = sum)
+  
+  # Plot histogram for energy consumption by clothes dryer
+  plot_dryer_energy <- ggplot(dryer_energy, aes(x = in.clothes_dryer, y = out.electricity.clothes_dryer.energy_consumption)) +
+    geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+    labs(x = "Clothes Dryer Category", y = "Total Energy Consumption (kWh)",
+         title = "Energy Usage by Clothes Dryer Category") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(labels = function(x) paste0(x, " kWh"))
+  
+  # Aggregate the data to count the number of unique houses in each category of clothes dryer
+  dryer_house_count <- aggregate(bldg_id ~ in.clothes_dryer, data = house_energy_weather_merged_data, FUN = function(x) length(unique(x)))
+  
+  # Plot histogram for number of houses by clothes dryer category
+  plot_dryer_house_count <- ggplot(dryer_house_count, aes(x = in.clothes_dryer, y = bldg_id)) +
+    geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+    labs(x = "Clothes Dryer Category", y = "Number of Houses",
+         title = "Number of Houses by Clothes Dryer Category") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  # Display both plots
+  plot_dryer_energy
+  plot_dryer_house_count
+  
+  # Washer
+  # Subset the data to include relevant columns for clothes washer
+  washer_data <- house_energy_weather_merged_data[, c("in.clothes_washer", 
+                                                      "out.electricity.clothes_washer.energy_consumption")]
+  
+  # Group by "in.clothes_washer" and calculate total energy consumption for clothes washer
+  washer_energy <- aggregate(out.electricity.clothes_washer.energy_consumption ~ in.clothes_washer, 
+                             data = washer_data, FUN = sum)
+  
+  # Plot histogram for energy consumption by clothes washer
+  plot_washer_energy <- ggplot(washer_energy, aes(x = in.clothes_washer, y = out.electricity.clothes_washer.energy_consumption)) +
+    geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+    labs(x = "Clothes Washer Category", y = "Total Energy Consumption (kWh)",
+         title = "Energy Usage by Clothes Washer Category") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    scale_y_continuous(labels = function(x) paste0(x, " kWh"))
+  
+  # Aggregate the data to count the number of unique houses in each category of clothes washer
+  washer_house_count <- aggregate(bldg_id ~ in.clothes_washer, data = house_energy_weather_merged_data, FUN = function(x) length(unique(x)))
+  
+  # Plot histogram for number of houses by clothes washer category
+  plot_washer_house_count <- ggplot(washer_house_count, aes(x = in.clothes_washer, y = bldg_id)) +
+    geom_bar(stat = "identity", fill = "skyblue", color = "black") +
+    labs(x = "Clothes Washer Category", y = "Number of Houses",
+         title = "Number of Houses by Clothes Washer Category") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+  # Display both plots
+  plot_washer_energy
+  plot_washer_house_count
+  
+  
+  #Linear Regression Model to predict current and future energy usage
+  
+# Select relevant columns
+relevant_columns <- c('bldg_id', 'county_id', 'date_time', 'total_energy_consumption',
+                      'Dry Bulb Temperature [°C]', 'Relative Humidity [%]',
+                      'Wind Speed [m/s]', 'Wind Direction [Deg]',
+                      'Global Horizontal Radiation [W/m2]',
+                      'Direct Normal Radiation [W/m2]',
+                      'Diffuse Horizontal Radiation [W/m2]',
+                      'out.electricity.cooling.energy_consumption',
+                      'out.electricity.cooling_fans_pumps.energy_consumption',
+                      'out.electricity.mech_vent.energy_consumption',
+                      'out.electricity.refrigerator.energy_consumption',
+                      'out.electricity.freezer.energy_consumption')
+
+# Subset the dataframe to include only the relevant columns
+subset_house_energy_weather_merged_data <- house_energy_weather_merged_data[, relevant_columns, with = FALSE]
+
+  
+  set.seed(123) # for reproducibility
+  # Create training and testing sets
+  # 60%- training data
+  # 40%- testing data
+  train_index <- createDataPartition(subset_house_energy_weather_merged_data$total_energy_consumption, p = 0.6, list = FALSE)
+  train_data <- as.data.table(subset_house_energy_weather_merged_data[train_index, ])
+  test_data <- as.data.table(subset_house_energy_weather_merged_data[-train_index, ])
+  
+  
+  # Build the linear regression model with multiple predictors
+  lm_model <- lm(total_energy_consumption ~ `Dry Bulb Temperature [°C]` + 
+                   `Relative Humidity [%]` + 
+                   `Wind Speed [m/s]` + 
+                   `Wind Direction [Deg]` + 
+                   `Global Horizontal Radiation [W/m2]` + 
+                   `Direct Normal Radiation [W/m2]`+
+                   `Diffuse Horizontal Radiation [W/m2]`,
+                 data = train_data)
+
+  # Summary- Evaluate the model
+  summary(lm_model)
+  
+#saving best model
+our_model <- lm_model
+save(our_model, file = "our_model.rda")
+
+library(shiny)
+library(rsconnect)
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Predictive Analysis of Energy Usage for eSC"),
+  sidebarLayout(
+    sidebarPanel(
+      fileInput("file_upload", "Upload CSV File"),
+      numericInput("n_rows", "Number of Rows to Display for Model Predictions:", value = 10, min = 1),
+      numericInput("n_rows1", "Number of Rows to Display for read in dataset:", value = 10, min = 1)
+    ),
+    mainPanel(
+      plotlyOutput("energy_plot"),
+      dataTableOutput("prediction_table"), 
+      dataTableOutput("table") 
+    )
+  )
+)
+
+# Define server
+server <- function(input, output, session) {
+  
+  # Load required libraries
+  library(plotly)
+  library(dplyr) 
+  library(caret)
+  library(shinydashboard)
+  library(tidyverse)
+  
+  # Load the pre-built model
+  load(file = "our_model.rda")
+  
+   #require an input file, then read a CSV file
+  getTestData <- reactive({
+    req(input$file_upload)
+    df<-read_csv(input$file_upload$datapath)
+    return(df)
+  })
+  
+  # Define the reactive expression to handle file upload and prediction
+  predictions <- reactive({
+    
+    #TestData for predictions using model
+    df<-getTestData()
+    
+    # Predict values for test data where `Dry Bulb Temperature [°C]` (weather temp predictor) is increased by 5
+    predicted_values <- predict(our_model, df)
+    df$`Dry Bulb Temperature [°C]` <- df$`Dry Bulb Temperature [°C]` + 5
+    future_predicted_values <- predict(our_model, df)
+    
+    # Combine predicted values with test_data to retain county_id and date_time
+    predicted_values_df <- data.frame(Present_Predicted = predicted_values, Future_Predicted = future_predicted_values)
+    predicted_values_df <- cbind(predicted_values_df, df[, c("county_id", "date_time"),with = FALSE])
+    
+    # Aggregate the data by county and date to get total predicted energy
+    aggregated_data <- aggregate(cbind(Present_Predicted, Future_Predicted) ~ county_id + date_time, predicted_values_df, sum)
+    return(aggregated_data)
+  })
+  
+  # Render the plot with predicted energy usage
+  output$energy_plot <- renderPlotly({
+    max_indices <- predictions() %>%
+      group_by(county_id) %>%
+      summarise(max_Predicted = max(Present_Predicted),
+                max_Future_Predicted = max(Future_Predicted),
+                date_time = date_time[which.max(Present_Predicted)])
+    
+    max_indices$date_time <- as.character(max_indices$date_time)
+    
+    plot_ly(max_indices, x = ~county_id) %>%
+      add_trace(y = ~max_Predicted, type = 'bar', name = 'Max Present Predicted Energy',
+                text = ~paste('County ID:', county_id, '<br>Date:', date_time, '<br>Max Present Predicted Energy:', max_Predicted)) %>%
+      add_trace(y = ~max_Future_Predicted, type = 'bar', name = 'Max Future Predicted Energy',
+                text = ~paste('County ID:', county_id, '<br>Date:', date_time, '<br>Max Future Predicted Energy:', max_Future_Predicted)) %>%
+      layout(title = 'Predictive Analysis of Energy Usage for eSC',
+             xaxis = list(title = 'County ID'),
+             yaxis = list(title = 'Energy Usage'),
+             barmode = 'group') %>%
+      config(displayModeBar = FALSE)
+
+  })
+ 
+  #Render the table with predictions
+  #show the output of the model
+  output$prediction_table <- renderDataTable({
+  predictions<-predictions()
+  predictions$date_time <- format(predictions$date_time, "%Y-%m-%d %H:%M:%S")
+  head(predictions, input$n_rows)
+  })
+ 
+  #show a few lines of the dataframe
+  # Function to render the table
+ output$table <- renderDataTable({
+    read_in_data <- getTestData()
+    # Display the first n_rows of the data
+  head(read_in_data, input$n_rows1)
+ })
+
+}
+# Run the application
+shinyApp(ui = ui, server = server)
+
+```
+
+
