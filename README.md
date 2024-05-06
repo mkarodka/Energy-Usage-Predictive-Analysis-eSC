@@ -71,15 +71,15 @@ Total energy consumption was calculated adding these energy consumptions and tak
 Identification of  weather conditions as predictors/independent variables for this energy consumption was done. This is covered in detail in section- Use of Modeling Techniques & Visualizations.
 Below is the visual showing distributed count of buidings using each above factor and hourly average energy consumption by each buidling category. Using this visual, one can see where extra energy is getting utilized and factors repsonsible for that. Based on this, suggestions for alternatives/solutions to consume less energy are given. Some of these insights in section- Interpretation of Results/Actionable Insights are below:
  
-<img width="700" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/4a7b8451-9926-4e3c-8b49-75667370b0b2"><br>
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/4a7b8451-9926-4e3c-8b49-75667370b0b2"><br>
 
-<img width="600" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/27da0476-7b0c-4d0e-845b-107f677f387b"><br>
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/27da0476-7b0c-4d0e-845b-107f677f387b"><br>
 
-<img width="600" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/6a8ce1c3-3b2a-4c98-b900-3111382e06ce"><br>
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/6a8ce1c3-3b2a-4c98-b900-3111382e06ce"><br>
 
-<img width="600" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/8f7999ff-8084-4f29-8855-06919bb32776"><br>
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/8f7999ff-8084-4f29-8855-06919bb32776"><br>
 
-<img width="600" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/33397442-3486-4791-83bb-5d8395a6fc0f"><br>
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/33397442-3486-4791-83bb-5d8395a6fc0f"><br>
 
 
 Use Of Modelling Techniques & Visualizations:
