@@ -1,6 +1,5 @@
 Predictive Analysis of Energy Usage for eSC
 
-
 Introduction:
 The project focuses on analyzing energy usage patterns for eSC, with a primary goal of understanding the drivers of energy consumption and promoting energy-saving behaviors among customers. This analysis is crucial for eSC(Energy Smart Communities) to address concerns about global warming, prevent blackouts caused by excessive demand on the electrical grid, and align with environmental sustainability objectives.
 To extract insights from the data, use of descriptive statistics, data visualization, and machine learning modeling technique is done.
@@ -48,8 +47,6 @@ Data Dictionary/Metadata Retrieval :
 Metadata information for all datasets is retrieved from csv file stored in AWS S3 bucket using read_csv() function from readr package.
 url: https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/data_dictionary.csv
 
-
-
 2.	Cleansing and Transformation: 
 
 •	Removed rows with missing values in any column of the energy and weather data frames using the complete.cases() function.
@@ -67,6 +64,9 @@ url: https://intro-datascience.s3.us-east-2.amazonaws.com/SC-data/data_dictionar
 Descriptive Statistics & Visualization:
 Descriptive statistics were utilized to provide context and a basic understanding of the data. Visualizations, including histograms, scatter plots, and bar charts, were utilized to illustrate patterns and relationships in the data. Factors responsible for total energy consumption for cooling purposes were identified. 
 Below are the factors responsible and electricity energy consumption for cooling purposes:
+
+<img width="379" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/eab8b887-abf6-4c84-9e1b-2a18754b1d10">
+
   
 Total energy consumption was calculated adding these energy consumptions and taken it as dependent variable in modelling.
 Identification of  weather conditions as predictors/independent variables for this energy consumption was done. This is covered in detail in section- Use of Modeling Techniques & Visualizations.
