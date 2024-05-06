@@ -66,18 +66,20 @@ Descriptive statistics were utilized to provide context and a basic understandin
 Below are the factors responsible and electricity energy consumption for cooling purposes:
 
 <img width="507" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/ddb130a6-f5e8-4e5e-9cfb-18f4c268e89b">
-
-
   
 Total energy consumption was calculated adding these energy consumptions and taken it as dependent variable in modelling.
 Identification of  weather conditions as predictors/independent variables for this energy consumption was done. This is covered in detail in section- Use of Modeling Techniques & Visualizations.
 Below is the visual showing distributed count of buidings using each above factor and hourly average energy consumption by each buidling category. Using this visual, one can see where extra energy is getting utilized and factors repsonsible for that. Based on this, suggestions for alternatives/solutions to consume less energy are given. Some of these insights in section- Interpretation of Results/Actionable Insights are below:
  
-<img width="480" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/4a7b8451-9926-4e3c-8b49-75667370b0b2">
-<img width="480" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/27da0476-7b0c-4d0e-845b-107f677f387b">
-<img width="504" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/6a8ce1c3-3b2a-4c98-b900-3111382e06ce">
-<img width="503" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/8f7999ff-8084-4f29-8855-06919bb32776">
-<img width="508" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/33397442-3486-4791-83bb-5d8395a6fc0f">
+<img width="500" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/4a7b8451-9926-4e3c-8b49-75667370b0b2">
+
+<img width="500" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/27da0476-7b0c-4d0e-845b-107f677f387b">
+
+<img width="500" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/6a8ce1c3-3b2a-4c98-b900-3111382e06ce">
+
+<img width="500" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/8f7999ff-8084-4f29-8855-06919bb32776">
+
+<img width="500" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/33397442-3486-4791-83bb-5d8395a6fc0f">
 
 
 Use Of Modelling Techniques & Visualizations:
@@ -168,10 +170,3 @@ With a value of 0.08003056, the MAE represents the average magnitude of errors b
 •	Mean Squared Error (MSE) and Root Mean Squared Error (RMSE): 
 The MSE (0.0153531) and RMSE (0.1239076) quantify the average squared and square root of errors, respectively. Both metrics provide additional insights into the model's predictive performance, with lower values indicating better accuracy.
 
-
-
-
-
-
-
-![image](https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/b5ff3f47-4ac9-4214-b948-a80cfcdbfc33)
