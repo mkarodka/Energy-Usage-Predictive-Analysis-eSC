@@ -65,7 +65,7 @@ Descriptive Statistics & Visualization:
 Descriptive statistics were utilized to provide context and a basic understanding of the data. Visualizations, including histograms, scatter plots, and bar charts, were utilized to illustrate patterns and relationships in the data. Factors responsible for total energy consumption for cooling purposes were identified. 
 Below are the factors responsible and electricity energy consumption for cooling purposes:
 
-<img width="507" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/ddb130a6-f5e8-4e5e-9cfb-18f4c268e89b">
+<img width="700" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/ddb130a6-f5e8-4e5e-9cfb-18f4c268e89b"><br>
   
 Total energy consumption was calculated adding these energy consumptions and taken it as dependent variable in modelling.
 Identification of  weather conditions as predictors/independent variables for this energy consumption was done. This is covered in detail in section- Use of Modeling Techniques & Visualizations.
@@ -106,8 +106,8 @@ tidyverse, ggplot2, and shiny dashboard, the application offers a polished user 
 In essence, this Shiny app provides a sophisticated yet accessible tool for users to delve into and interpret weather data, serving as a valuable resource for meteorological analysis.
 
 Here is the deployed application: https://mugdha-karodkar.shinyapps.io/IST687_Final_Project/
-<img width="510" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/7f383547-bfc4-43f2-bdd5-f3e5e1896cf9">
-<img width="513" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/f59c365c-892a-4fcc-839e-dc2593e4851d">
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/7f383547-bfc4-43f2-bdd5-f3e5e1896cf9"><br>
+<img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/f59c365c-892a-4fcc-839e-dc2593e4851d"><br>
 
 Interpretation Of Results/Actionable Insights:
 The results of our analysis provide valuable insights into the factors driving energy usage in eSC. Key findings include the significant impact of weather conditions, building characteristics, and historical energy consumption on future energy usage. 
@@ -122,15 +122,15 @@ Below are the insights:
 
 5.	Encourage houses without standard efficient ceiling fans to install them for improved air circulation and reduced AC reliance. For houses with ceiling fans already in place, promote their usage to decrease AC energy consumption in July.
 
- <img width="523" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/f737f96d-9f98-4f71-b1fe-eff3a449b6ec">
+ <img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/f737f96d-9f98-4f71-b1fe-eff3a449b6ec"><br>
 
 
 6.	Rrecommend heat pump dryers as they are gaining popularity for their energy efficiency. They utilize a heat pump system to extract moisture from the air inside the dryer and recycle heat, making them an eco-friendly choice.
-   <img width="495" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/08f58483-6a70-4195-acf3-24b7194a897e">
+   <img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/08f58483-6a70-4195-acf3-24b7194a897e"><br>
 
 
 7.	Recommend Energy Star-rated Front load washers.
-   <img width="497" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/015fb710-74a5-4b2c-ac04-ce923761c1ea">
+   <img width="1000" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/015fb710-74a5-4b2c-ac04-ce923761c1ea"><br>
 
  
 Energy Star-rated washers are generally more energy-efficient compared to standard washers.
