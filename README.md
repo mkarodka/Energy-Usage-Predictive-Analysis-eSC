@@ -65,18 +65,19 @@ Descriptive Statistics & Visualization:
 Descriptive statistics were utilized to provide context and a basic understanding of the data. Visualizations, including histograms, scatter plots, and bar charts, were utilized to illustrate patterns and relationships in the data. Factors responsible for total energy consumption for cooling purposes were identified. 
 Below are the factors responsible and electricity energy consumption for cooling purposes:
 
-<img width="379" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/eab8b887-abf6-4c84-9e1b-2a18754b1d10">
+<img width="507" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/ddb130a6-f5e8-4e5e-9cfb-18f4c268e89b">
+
 
   
 Total energy consumption was calculated adding these energy consumptions and taken it as dependent variable in modelling.
 Identification of  weather conditions as predictors/independent variables for this energy consumption was done. This is covered in detail in section- Use of Modeling Techniques & Visualizations.
 Below is the visual showing distributed count of buidings using each above factor and hourly average energy consumption by each buidling category. Using this visual, one can see where extra energy is getting utilized and factors repsonsible for that. Based on this, suggestions for alternatives/solutions to consume less energy are given. Some of these insights in section- Interpretation of Results/Actionable Insights are below:
  
- 
- 
- 
- 
-
+<img width="480" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/4a7b8451-9926-4e3c-8b49-75667370b0b2">
+<img width="480" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/27da0476-7b0c-4d0e-845b-107f677f387b">
+<img width="504" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/6a8ce1c3-3b2a-4c98-b900-3111382e06ce">
+<img width="503" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/8f7999ff-8084-4f29-8855-06919bb32776">
+<img width="508" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/33397442-3486-4791-83bb-5d8395a6fc0f">
 
 
 Use Of Modelling Techniques & Visualizations:
@@ -84,10 +85,13 @@ Different modeling techniques were explored, including supervised-k-fold cross-v
 Initially exploration of supervised-k-fold cross-validation was done with SVM trying different cross number of cross folds keeping 60% data for training the model due to its potential for capturing complex relationships. 
 However, extensive computational requirements led to long training times. Despite attempts to optimize parameters and fold settings, SVM remained impractical for our project's time constraints. As a result, I opted to pursue alternative modeling approach discarding SVM to ensure efficient model training and evaluation.
 supervised-k-fold cross-validation with SVM:
- 
+
+<img width="544" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/0ca7adef-ab68-4cf1-97f2-bc80d3e84526">
+
 Model evaluation metrics such as R-squared, Mean Absolute Error, Mean Squared Error, and Root Mean Squared Error were used to evaluate model based on which I decided to go with linear regression model with partition to train model where 60% of the data is trained reserving 40% of the data for validation or testing. 
 Linear Regression:
- 
+<img width="499" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/bb457a1d-bca0-4682-8395-5ff3deb0d4af">
+
 Validation details are described in detail in further Validation section of report.
 Visualizations of model predictions (present and future total energy usage) per county were generated to evaluate difference in energy consumptions (present and future) for same set of users when 5 degrees of atmospheric temperature is increased. 
 It would be helpful to identify areas of improvement to reduce energy consumption.
@@ -100,8 +104,8 @@ tidyverse, ggplot2, and shiny dashboard, the application offers a polished user 
 In essence, this Shiny app provides a sophisticated yet accessible tool for users to delve into and interpret weather data, serving as a valuable resource for meteorological analysis.
 
 Here is the deployed application: https://mugdha-karodkar.shinyapps.io/IST687_Final_Project/
- 
- 
+<img width="510" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/7f383547-bfc4-43f2-bdd5-f3e5e1896cf9">
+<img width="513" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/f59c365c-892a-4fcc-839e-dc2593e4851d">
 
 Interpretation Of Results/Actionable Insights:
 The results of our analysis provide valuable insights into the factors driving energy usage in eSC. Key findings include the significant impact of weather conditions, building characteristics, and historical energy consumption on future energy usage. 
@@ -116,12 +120,16 @@ Below are the insights:
 
 5.	Encourage houses without standard efficient ceiling fans to install them for improved air circulation and reduced AC reliance. For houses with ceiling fans already in place, promote their usage to decrease AC energy consumption in July.
 
- 
+ <img width="523" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/f737f96d-9f98-4f71-b1fe-eff3a449b6ec">
+
 
 6.	Rrecommend heat pump dryers as they are gaining popularity for their energy efficiency. They utilize a heat pump system to extract moisture from the air inside the dryer and recycle heat, making them an eco-friendly choice.
- 
+   <img width="495" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/08f58483-6a70-4195-acf3-24b7194a897e">
+
 
 7.	Recommend Energy Star-rated Front load washers.
+   <img width="497" alt="image" src="https://github.com/mkarodka/Energy-Usage-Predictive-Analysis-eSC/assets/108047751/015fb710-74a5-4b2c-ac04-ce923761c1ea">
+
  
 Energy Star-rated washers are generally more energy-efficient compared to standard washers.
 Here's why: Energy Star-rated washers must meet specific energy efficiency criteria set by the Environmental Protection Agency (EPA) in the United States. These criteria typically include requirements for water usage, energy consumption during washing and spinning cycles, and overall efficiency. Standard washers may not meet these stringent criteria and may consume more energy and water.
