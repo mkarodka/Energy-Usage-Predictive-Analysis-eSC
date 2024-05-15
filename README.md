@@ -11,11 +11,5 @@ Detailed insights and findings are available in the project report.
 
 Access the Shiny App [here](https://mugdha-karodkar.shinyapps.io/IST687_Final_Project/). You can upload the `merged_energy_data.csv` file to visualize the analysis.
 
-## How to Use
-
-1. Clone the repository to your local machine.
-2. Navigate to the `code` directory.
-3. Run the code to replicate the analysis.
-4. Upload `merged_energy_data.csv` to the Shiny App to visualize the analysis interactively.
 
 
