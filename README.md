@@ -11,7 +11,7 @@ This project analyzes energy usage patterns for Energy Smart Communities (eSC), 
 - Detailed recommendations for building improvements
 
 ## Quick Links
-- [Interactive Dashboard](https://mugdha-karodkar.shinyapps.io/IST687_Final_Project/)
+- [Interactive Dashboard](https://mugdha-karodkar.shinyapps.io/IST687_Final_Project/) - Please upload merged_energy_data.csv
 - [Detailed Project Report](Project-Report.pdf)
 - [Project on LinkedIn](https://linkedin.com/in/mugdha-karodkar/details/projects/)
 
