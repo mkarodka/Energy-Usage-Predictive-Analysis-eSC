@@ -31,9 +31,7 @@ For complete project details, methodology, and findings, please refer to our [co
 
 ## Technologies Used
 - R Programming Language
-- AWS S3
 - Shiny Dashboard
-- Statistical Modeling Packages
 
 ## Contact
 - LinkedIn: [Mugdha Karodkar](https://linkedin.com/in/mugdha-karodkar/)
