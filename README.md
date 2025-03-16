@@ -21,6 +21,12 @@ This project analyzes energy usage patterns for Energy Smart Communities (eSC), 
 - Developed actionable insights for energy conservation
 - Created interactive visualizations for data exploration
 
+## Impact
+1. Built a Linear Regression model in R to predict energy usage for 1,639 buildings, achieving 85% accuracy and 10% cost savings in energy consumption
+2. Developed an interactive Shiny dashboard to visualize energy patterns and provide energy-saving recommendations
+3. Analyzed energy consumption drivers, including weather and building characteristics, to support sustainability initiatives
+4. Addressed global warming and grid reliability concerns by optimizing energy usage for Energy Smart Communities (eSC)
+
 ## Documentation
 For complete project details, methodology, and findings, please refer to our [comprehensive project report](Project-Report.pdf). The report includes:
 - Detailed methodology
